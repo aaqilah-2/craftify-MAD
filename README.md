@@ -1,6 +1,6 @@
-# craftify
+# craftify-MAD
 
-A new Flutter project.
+This is a Flutter project for Craftify.
 
 ## Getting Started
 
