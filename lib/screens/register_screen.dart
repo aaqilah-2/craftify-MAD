@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -40,6 +41,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       if (response.statusCode == 200) {
+        // Parse the response to get the token
+        final data = jsonDecode(response.body);
+        String token = data['token'];
+
+        // Print the token to the console
+        print('Token: $token');
+
+        // Store the token in SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', token);
+
         // Navigate to home
         Navigator.pushReplacementNamed(context, '/home');
       } else {

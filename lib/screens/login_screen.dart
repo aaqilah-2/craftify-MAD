@@ -24,7 +24,11 @@ class LoginScreen extends StatelessWidget {
 
       // Save the token using shared preferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('authToken', responseData['token']);
+      await prefs.setString('authToken', responseData['token']); // Store the token
+
+      // Retrieve the token to verify it's stored
+      String? storedToken = prefs.getString('authToken');
+      print('Stored Token: $storedToken'); // Print the stored token
 
       // Navigate to home screen
       Navigator.pushReplacementNamed(context, '/home');
