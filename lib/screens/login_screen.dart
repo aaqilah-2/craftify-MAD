@@ -13,7 +13,7 @@ class LoginScreen extends StatelessWidget {
 
     // Making API request
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/api/user/auth'), // Update with your API URL
+      Uri.parse('http://192.168.186.77:8000/api/user/auth'), // Update with your API URL
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'email': email, 'password': password}),
     );
@@ -30,8 +30,17 @@ class LoginScreen extends StatelessWidget {
       String? storedToken = prefs.getString('authToken');
       print('Stored Token: $storedToken'); // Print the stored token
 
-      // Navigate to home screen
-      Navigator.pushReplacementNamed(context, '/home');
+      // Check the user role from the response (assuming 'user' contains 'role')
+      int userRole = responseData['user']['role'];
+
+      // Navigate based on user role
+      if (userRole == 2) {
+        // If Artisan, navigate to Artisan home screen
+        Navigator.pushReplacementNamed(context, '/artisan_home');
+      } else if (userRole == 3) {
+        // If Customer, navigate to Customer home screen
+        Navigator.pushReplacementNamed(context, '/home');
+      }
     } else {
       // Show an error message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -175,6 +184,7 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () {
+                      // Redirect to the register screen directly
                       Navigator.pushNamed(context, '/register');
                     },
                     style: ElevatedButton.styleFrom(

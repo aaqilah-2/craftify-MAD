@@ -9,6 +9,7 @@ import 'package:craftify/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'routes.dart';
 
+
 void main() {
   runApp(MyApp());
 }

@@ -9,34 +9,32 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  TextEditingController _nameController = TextEditingController(); // Add name controller
+  TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
-  TextEditingController _phoneController = TextEditingController();
-  TextEditingController _dateController = TextEditingController();
   bool _isChecked = false;
 
-  // Added for role selection
-  String _selectedRole = '2'; // Default role: Artisan (2 = Artisan, 3 = Customer)
+  // Role selection: Default is Artisan
+  String _selectedRole = '2';
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
-      final String name = _nameController.text;  // Get the user's name
+      final String name = _nameController.text;
       final String email = _emailController.text;
       final String password = _passwordController.text;
 
       // Send a POST request to register
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/api/user/auth'), // Update with your API URL
+        Uri.parse('http://192.168.186.77:8000/api/user/auth'), // Use your backend API URL
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'name': name, // Use the entered name
+          'name': name,
           'email': email,
           'password': password,
-          'role': _selectedRole, // Selected role (Artisan or Customer)
+          'role': _selectedRole, // Artisan or Customer role
         }),
       );
 
@@ -45,15 +43,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
         final data = jsonDecode(response.body);
         String token = data['token'];
 
-        // Print the token to the console
-        print('Token: $token');
-
         // Store the token in SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
 
-        // Navigate to home
-        Navigator.pushReplacementNamed(context, '/home');
+        // Navigate based on role
+        if (_selectedRole == '2') {
+          Navigator.pushReplacementNamed(context, '/artisan_register');
+        } else if (_selectedRole == '3') {
+          Navigator.pushReplacementNamed(context, '/customer_register');
+        }
       } else {
         // Show error
         ScaffoldMessenger.of(context).showSnackBar(
@@ -70,7 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Form(
-            key: _formKey, // Add form key for validation
+            key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -83,14 +82,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-                // Name field
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
-                    labelText: 'Name',
-                    labelStyle: TextStyle(
-                      fontFamily: 'Roboto',
-                    ),
+                    labelText: 'Name *',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
@@ -101,14 +96,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
                 SizedBox(height: 10),
-                // Email field
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    labelText: 'Email',
-                    labelStyle: TextStyle(
-                      fontFamily: 'Roboto',
-                    ),
+                    labelText: 'Email *',
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.emailAddress,
@@ -123,14 +114,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
                 SizedBox(height: 10),
-                // Password field
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: TextStyle(
-                      fontFamily: 'Roboto',
-                    ),
+                    labelText: 'Password *',
                     border: OutlineInputBorder(),
                   ),
                   obscureText: true,
@@ -145,14 +132,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
                 SizedBox(height: 10),
-                // Confirm password field
                 TextFormField(
                   controller: _confirmPasswordController,
                   decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    labelStyle: TextStyle(
-                      fontFamily: 'Roboto',
-                    ),
+                    labelText: 'Confirm Password *',
                     border: OutlineInputBorder(),
                   ),
                   obscureText: true,
@@ -164,17 +147,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
                 SizedBox(height: 10),
-                // Role selection dropdown
                 DropdownButtonFormField<String>(
                   value: _selectedRole,
                   items: [
                     DropdownMenuItem(
                       child: Text('Artisan'),
-                      value: '2', // Artisan
+                      value: '2',
                     ),
                     DropdownMenuItem(
                       child: Text('Customer'),
-                      value: '3', // Customer
+                      value: '3',
                     ),
                   ],
                   onChanged: (value) {
@@ -183,10 +165,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     });
                   },
                   decoration: InputDecoration(
-                    labelText: 'Select Role',
-                    labelStyle: TextStyle(
-                      fontFamily: 'Roboto',
-                    ),
+                    labelText: 'Select Role *',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -201,27 +180,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         });
                       },
                     ),
-                    Text(
-                      'I agree to the Terms and Conditions',
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                      ),
-                    ),
+                    Text('I agree to the Terms and Conditions'),
                   ],
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _isChecked ? _register : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isChecked ? Colors.pink.shade100 : Colors.grey,
-                  ),
-                  child: Text(
-                    'Register',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Roboto',
-                    ),
-                  ),
+                  child: Text('Register'),
                 ),
               ],
             ),
