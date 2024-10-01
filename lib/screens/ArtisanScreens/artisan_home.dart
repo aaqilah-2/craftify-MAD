@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:craftify/widgets/bottom_nav_bar.dart'; // Import BottomNavBar
 
 class ArtisanHomeScreen extends StatefulWidget {
   @override
@@ -36,7 +37,7 @@ class _ArtisanHomeScreenState extends State<ArtisanHomeScreen> {
               leading: Icon(Icons.store),
               title: Text('Manage Products', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Roboto')),
               onTap: () {
-                // Navigate to Manage Products screen
+                // Placeholder for future functionality
               },
             ),
             ListTile(
@@ -44,6 +45,7 @@ class _ArtisanHomeScreenState extends State<ArtisanHomeScreen> {
               title: Text('Orders', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Roboto')),
               onTap: () {
                 // Navigate to Orders screen
+                // Placeholder: Add the Orders screen here when available
               },
             ),
             ListTile(
@@ -51,6 +53,7 @@ class _ArtisanHomeScreenState extends State<ArtisanHomeScreen> {
               title: Text('Analytics', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Roboto')),
               onTap: () {
                 // Navigate to Analytics screen
+                // Placeholder: Add the Analytics screen here when available
               },
             ),
           ],
@@ -112,7 +115,7 @@ class _ArtisanHomeScreenState extends State<ArtisanHomeScreen> {
                         label: 'Manage Products',
                         color: Colors.blue.shade100,
                         onTap: () {
-                          // Manage Products action
+                          // Placeholder for Manage Products action
                         },
                       ),
                       _buildDashboardBox(
@@ -120,7 +123,7 @@ class _ArtisanHomeScreenState extends State<ArtisanHomeScreen> {
                         label: 'Orders',
                         color: Colors.green.shade100,
                         onTap: () {
-                          // Orders action
+                          // Orders action placeholder
                         },
                       ),
                     ],
@@ -134,7 +137,7 @@ class _ArtisanHomeScreenState extends State<ArtisanHomeScreen> {
                         label: 'Analytics',
                         color: Colors.purple.shade100,
                         onTap: () {
-                          // Analytics action
+                          // Analytics action placeholder
                         },
                       ),
                       _buildDashboardBox(
@@ -142,7 +145,7 @@ class _ArtisanHomeScreenState extends State<ArtisanHomeScreen> {
                         label: 'Settings',
                         color: Colors.orange.shade100,
                         onTap: () {
-                          // Settings action
+                          // Settings action placeholder
                         },
                       ),
                     ],
@@ -153,6 +156,8 @@ class _ArtisanHomeScreenState extends State<ArtisanHomeScreen> {
           ),
         ],
       ),
+      // Add the BottomNavBar here for navigation across screens
+      bottomNavigationBar: BottomNavBar(currentIndex: 0, userRole: 2), // Assuming 0 is for the Home Screen
     );
   }
 
