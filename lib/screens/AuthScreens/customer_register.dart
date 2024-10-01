@@ -61,7 +61,7 @@ class _CustomerProfileFormState extends State<CustomerProfileForm> {
 
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://192.168.186.77:8000/api/customer/profile'),
+        Uri.parse('http://192.168.8.101:8000/api/customer/profile'),
       );
 
       request.headers.addAll(headers);

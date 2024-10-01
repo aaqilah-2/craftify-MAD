@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:craftify/widgets/bottom_nav_bar.dart';
 import 'package:craftify/widgets/product_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -10,6 +11,20 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedSegment = 0;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int? userRole;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserRole();
+  }
+
+  Future<void> _loadUserRole() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userRole = prefs.getInt('userRole'); // Retrieve user role from shared preferences
+    });
+  }
 
   void _onSegmentTapped(int index) {
     setState(() {
@@ -24,48 +39,22 @@ class _HomeScreenState extends State<HomeScreen> {
         title: 'Ceramic Bug Cube',
         price: 'Rs.1000.00',
         image: 'assets/images/image1.png',
-        description: 'A unique square-shaped ceramic piece, artfully designed in sleek black. This bug-inspired sculpture adds a touch of whimsical elegance to any space. Each piece is meticulously handcrafted, ensuring that no two are exactly alike. Perfect as a conversation starter or a distinctive addition to your home decor collection.',
+        description:
+        'A unique square-shaped ceramic piece, artfully designed in sleek black. This bug-inspired sculpture adds a touch of whimsical elegance to any space.',
         rating: 4.5,
       ),
       ProductCardData(
         title: 'Ebon Cream Wall Art',
         price: 'Rs.2000.00',
         image: 'assets/images/image2.png',
-        description: 'A striking piece of wall art featuring a harmonious blend of black and cream colors. This handcrafted artwork is perfect for adding a modern yet rustic charm to your decor. Its intricate design and rich textures make it a standout piece, ideal for living rooms, bedrooms, or office spaces. Celebrate the fusion of contemporary and traditional artistry with this beautiful creation.',
+        description:
+        'A striking piece of wall art featuring a harmonious blend of black and cream colors. This handcrafted artwork is perfect for adding a modern yet rustic charm to your decor.',
         rating: 3.8,
       ),
-      ProductCardData(
-        title: 'Keepsake Box',
-        price: 'Rs.3000.00',
-        image: 'assets/images/image3.png',
-        description: 'This exquisite box is crafted from delicately stitched bamboo canes. Perfect for storing your treasured items, it brings a touch of nature\'s beauty into your home. The natural materials and careful craftsmanship ensure durability and a unique aesthetic. Use it to keep jewelry, trinkets, or cherished mementos safe while adding a rustic charm to your space.',
-        rating: 4.2,
-      ),
-      ProductCardData(
-        title: 'Bamboo Cake Tray',
-        price: 'Rs.4000.00',
-        image: 'assets/images/image4.png',
-        description: 'A beautifully handcrafted tray made from bamboo canes, ideal for serving cakes and pastries. Its rustic elegance makes it a perfect centerpiece for your gatherings. The sturdy yet lightweight design allows for easy handling, and the natural bamboo finish complements any decor style. Impress your guests with this eco-friendly, artisanal serving piece.',
-        rating: 4.0,
-      ),
-      ProductCardData(
-        title: 'Artisan Carry Box',
-        price: 'Rs.5000.00',
-        image: 'assets/images/image5.png',
-        description: 'A handmade carrier box that combines functionality with aesthetic appeal. Its sturdy construction and natural finish make it ideal for transporting goods with style. Whether you are heading to a picnic, market, or simply organizing at home, this carrier box offers practicality and charm. Each box is crafted with care, reflecting the skill and dedication of the artisan.',
-        rating: 4.7,
-      ),
-      ProductCardData(
-        title: 'Feather Charm Stick',
-        price: 'Rs.6000.00',
-        image: 'assets/images/image6.png',
-        description: 'An enchanting ornament stick adorned with delicate feathers. This handcrafted piece adds a bohemian flair to any setting, perfect for enhancing your decorative arrangements. The lightweight design and natural materials make it a versatile accessory for both indoor and outdoor spaces. Hang it in your garden, living room, or bedroom to evoke a sense of tranquility and artistic expression.',
-        rating: 4.1,
-      ),
+      // Add more products as needed
     ];
 
     // Filter products based on selected segment (not implemented in this example)
-
     return Column(
       children: List.generate(products.length ~/ 2, (index) {
         int startIndex = index * 2;
@@ -80,14 +69,15 @@ class _HomeScreenState extends State<HomeScreen> {
               rating: products[startIndex].rating,
               isDarkMode: Theme.of(context).brightness == Brightness.dark,
             ),
-            ProductCard(
-              title: products[startIndex + 1].title,
-              price: products[startIndex + 1].price,
-              image: products[startIndex + 1].image,
-              description: products[startIndex + 1].description,
-              rating: products[startIndex + 1].rating,
-              isDarkMode: Theme.of(context).brightness == Brightness.dark,
-            ),
+            if (startIndex + 1 < products.length)
+              ProductCard(
+                title: products[startIndex + 1].title,
+                price: products[startIndex + 1].price,
+                image: products[startIndex + 1].image,
+                description: products[startIndex + 1].description,
+                rating: products[startIndex + 1].rating,
+                isDarkMode: Theme.of(context).brightness == Brightness.dark,
+              ),
           ],
         );
       }),
@@ -125,56 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Navigate to Wall Art category
               },
             ),
-            ListTile(
-              leading: Icon(Icons.kitchen),
-              title: Text('KITCHEN & DINE', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Roboto')),
-              onTap: () {
-                // Navigate to Kitchen & Dine category
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.bathtub),
-              title: Text('BATH & BODY', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Roboto')),
-              onTap: () {
-                // Navigate to Bath & Body category
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.diamond),
-              title: Text('JEWELRY', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Roboto')),
-              onTap: () {
-                // Navigate to Jewelry category
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.brush),
-              title: Text('CRAFT SUPPLIES & TOOLS', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Roboto')),
-              onTap: () {
-                // Navigate to Craft Supplies & Tools category
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.checkroom),
-              title: Text('CLOTHING', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Roboto')),
-              onTap: () {
-                // Navigate to Clothing category
-              },
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.local_offer),
-              title: Text('OFFERS', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Roboto')),
-              onTap: () {
-                // Navigate to Offers section
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.new_releases),
-              title: Text('NEW ARRIVALS', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Roboto')),
-              onTap: () {
-                // Navigate to New Arrivals section
-              },
-            ),
+            // Add more categories here
           ],
         ),
       ),
@@ -287,7 +228,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(currentIndex: 0),
+      // Add BottomNavBar with userRole for customer
+      bottomNavigationBar: userRole != null
+          ? BottomNavBar(currentIndex: 0, userRole: userRole!) // Assuming 0 is for Home
+          : SizedBox(), // Show nothing until userRole is loaded
     );
   }
 }
