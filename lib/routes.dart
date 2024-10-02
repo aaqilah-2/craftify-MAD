@@ -110,6 +110,7 @@ Route<dynamic>? generateAnimatedRoute(RouteSettings settings) {
 final Map<String, WidgetBuilder> appRoutes = {
   '/': (context) => LoginScreen(),
   '/register': (context) => RegisterScreen(),
+  '/login':(context) => LoginScreen(),
 
   // Artisan routes
   '/artisan_home': (context) => ArtisanHomeScreen(),

@@ -9,7 +9,7 @@ import 'package:craftify/widgets/bottom_nav_bar.dart';
 
 import 'package:craftify/models/ArtisanProfile.dart';
 
-import '../../models/User.dart';
+import 'package:craftify/models/User.dart';
 
 class ArtisanProfileScreen extends StatefulWidget {
     @override
@@ -26,6 +26,51 @@ class _ArtisanProfileScreenState extends State<ArtisanProfileScreen> {
         _loadUserRole(); // Fetch the stored user role
         _fetchProfileData(); // Fetch the profile data from the server
     }
+
+    Future<void> _logout(BuildContext context) async {
+        try {
+            // Get the stored token
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            String? token = prefs.getString('authToken');
+
+            if (token != null) {
+                // Make the API call to the logout route
+                final response = await http.post(
+                    Uri.parse('http://192.168.8.101:8000/api/logout'), // Your logout API URL
+                    headers: {
+                        'Authorization': 'Bearer $token',
+                        'Content-Type': 'application/json',
+                    },
+                );
+
+                print('Response status: ${response.statusCode}');
+                print('Response body: ${response.body}');
+
+                if (response.statusCode == 200) {
+                    // Logout successful
+                    print('Logout successful');
+                    // Remove the token from SharedPreferences
+                    await prefs.remove('authToken');
+                    await prefs.remove('userRole');
+
+                    // Navigate to the login screen
+                    Navigator.pushReplacementNamed(context, '/login');
+                } else {
+                    // Show an error message if logout fails
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Logout failed! ${response.body}')),
+                    );
+                }
+            } else {
+                print('No token found in SharedPreferences');
+            }
+        } catch (error) {
+            print("Error during logout: $error");
+        }
+    }
+
+
+
 
     Future<void> _loadUserRole() async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -98,7 +143,7 @@ class _ArtisanProfileScreenState extends State<ArtisanProfileScreen> {
                         children: <Widget>[
                             CircleAvatar(
                                 radius: 50,
-                                backgroundImage: NetworkImage(profileProvider.artisanProfile!.logo), // Logo should always be present
+                                backgroundImage: NetworkImage(profileProvider.artisanProfile!.logo!), // Ensure this is a full URL
                             ),
                             SizedBox(height: 20),
                             Text(
@@ -144,6 +189,16 @@ class _ArtisanProfileScreenState extends State<ArtisanProfileScreen> {
                                     backgroundColor: Colors.pink.shade200,
                                 ),
                                 child: Text('Edit Profile'),
+                            ),
+                            // Logout Button
+                            SizedBox(height: 20),
+                            ElevatedButton.icon(
+                                onPressed: () => _logout(context),
+                                icon: Icon(Icons.logout),
+                                label: Text('Logout'),
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.redAccent,
+                                ),
                             ),
                         ],
                     ),
