@@ -44,7 +44,9 @@ class _ArtisanProfileFormState extends State<ArtisanProfileForm> {
     if (_formKey.currentState!.validate()) {
       // Retrieve the token from SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('auth_token');
+      String? token = prefs.getString('authToken');
+      print('Stored Token: $token');
+
 
       if (token == null) {
         ScaffoldMessenger.of(context).showSnackBar(

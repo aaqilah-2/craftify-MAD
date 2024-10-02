@@ -46,6 +46,7 @@ class _CustomerProfileFormState extends State<CustomerProfileForm> {
       // Retrieve the token from SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('auth_token');
+      print('Stored Token: $token');
 
       if (token == null) {
         ScaffoldMessenger.of(context).showSnackBar(

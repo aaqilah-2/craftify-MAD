@@ -28,7 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       // Send a POST request to register
       final response = await http.post(
-        Uri.parse('192.168.8.101:8000/api/user/auth'), // Use your backend API URL
+        Uri.parse('http://192.168.8.101:8000/api/user/auth'), // Use your backend API URL
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'name': name,
@@ -49,8 +49,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         // Navigate based on role
         if (_selectedRole == '2') {
+          // Artisan
           Navigator.pushReplacementNamed(context, '/artisan_register');
         } else if (_selectedRole == '3') {
+          // Customer
           Navigator.pushReplacementNamed(context, '/customer_register');
         }
       } else {

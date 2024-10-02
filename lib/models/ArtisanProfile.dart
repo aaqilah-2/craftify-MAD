@@ -7,9 +7,9 @@ class ArtisanProfile {
   final String bio;
   final String contactNumber;
   final List<String> skills;
-  final String? socialMediaLinks; // Make it optional and nullable
-  final double? serviceRadiusKm; // Nullable
-  final String logo; // Required field, cannot be null
+  final String? socialMediaLinks;
+  final double? serviceRadiusKm;
+  final String logo;
 
   ArtisanProfile({
     required this.userId,
@@ -20,9 +20,9 @@ class ArtisanProfile {
     required this.bio,
     required this.contactNumber,
     required this.skills,
-    this.socialMediaLinks,  // Optional and nullable
-    this.serviceRadiusKm,   // Optional and nullable
-    required this.logo,     // Required field
+    this.socialMediaLinks,
+    this.serviceRadiusKm,
+    required this.logo,
   });
 
   factory ArtisanProfile.fromJson(Map<String, dynamic> json) {
@@ -34,11 +34,15 @@ class ArtisanProfile {
       yearsOfExperience: json['years_of_experience'] ?? 0,
       bio: json['bio'] ?? '',
       contactNumber: json['contact_number'] ?? '',
-      // Correct the skills parsing:
-      skills: json['skills'] is String ? (json['skills'] as String).split(', ') : [],
-      socialMediaLinks: json['social_media_links'], // Can be null
-      serviceRadiusKm: (json['service_radius_km'] as num?)?.toDouble(),  // Convert to double, nullable
-      logo: json['logo'] ?? 'assets/images/default_logo.png', // Fallback to a default image if null
+      skills: json['skills'] is List
+          ? List<String>.from(json['skills'])
+          : (json['skills'] is String ? (json['skills'] as String).split(', ') : []),
+      socialMediaLinks: json['social_media_links'],
+      // Handle serviceRadiusKm as either a String or num and convert to double
+      serviceRadiusKm: json['service_radius_km'] != null
+          ? double.tryParse(json['service_radius_km'].toString()) ?? 0.0
+          : null,
+      logo: json['logo'] ?? 'assets/images/profilepic.png',
     );
   }
 }

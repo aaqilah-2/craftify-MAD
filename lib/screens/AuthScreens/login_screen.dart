@@ -114,6 +114,21 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              SizedBox(height: 20),
+              TextButton(
+                onPressed: () {
+                  // Navigate to the Register screen
+                  Navigator.pushNamed(context, '/register');
+                },
+                child: Text(
+                  'Register Now',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.pink.shade100 : Colors.black,
+                    fontFamily: 'Roboto',
+                    fontSize: 16,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
