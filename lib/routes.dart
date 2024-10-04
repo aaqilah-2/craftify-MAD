@@ -5,7 +5,7 @@ import 'screens/AuthScreens/login_screen.dart';
 import 'screens/AuthScreens/register_screen.dart';
 import 'screens/CustomerScreens/home_screen.dart';
 import 'screens/cart_screen.dart';
-import 'screens/favorites_screen.dart';
+import 'screens/CustomerScreens/favorites_screen.dart';
 import 'profile_screen.dart';
 import 'product_details_screen.dart';
 import 'screens/ArtisanScreens/artisan_home.dart';
@@ -44,16 +44,16 @@ Route<dynamic>? generateAnimatedRoute(RouteSettings settings) {
     //       );
     //     },
     //   );
-    // case '/favorites':
-    //   return PageRouteBuilder(
-    //     pageBuilder: (context, animation, secondaryAnimation) => FavoritesScreen(),
-    //     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-    //       return FadeTransition(
-    //         opacity: animation,
-    //         child: child,
-    //       );
-    //     },
-    //   );
+    case '/favorites':
+      return PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => FavoritesScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+      );
     case '/customer_profile':
       return PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => CustomerProfileScreen(),
@@ -127,14 +127,14 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/customer_register': (context) => CustomerProfileForm(),
   '/home': (context) => HomeScreen(), //customer home page
   '/customer_profile': (context) =>CustomerProfileScreen(),
-
+  '/favorites': (context) => FavoritesScreen(),
 
 
 
 
   //old customer routes
  // '/cart': (context) => CartScreen(),
-  //'/favorites': (context) => FavoritesScreen(),
+
  // '/profile': (context) => ProfileScreen(),
 
 };

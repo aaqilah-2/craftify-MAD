@@ -3,8 +3,39 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
+
   // Define the API base URL
-  static const String apiUrl = '192.168.8.104:8000/api';
+  static const String apiUrl = 'http://192.168.8.104:8000/api';  // Ensure it is formatted properly with "http"
+
+  // New method to fetch user details (after login)
+  Future<void> fetchUserDetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('authToken');  // Ensure correct token field is used
+
+    if (token != null) {
+      final response = await http.get(
+        Uri.parse('$apiUrl/user/auth'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final userData = jsonDecode(response.body);
+
+        // Store user details in SharedPreferences
+        prefs.setInt('userId', userData['id']);
+        prefs.setString('userName', userData['name']);
+        prefs.setInt('userRole', userData['role']);
+        print('User ID stored: ${userData['id']}');
+      } else {
+        print('Failed to fetch user details: ${response.body}');
+      }
+    } else {
+      print('No token found');
+    }
+  }
 
   // Login method
   Future<Map<String, dynamic>> login(String email, String password) async {
@@ -22,7 +53,10 @@ class AuthService {
 
         // Store the token in shared preferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', responseData['token']);
+        await prefs.setString('authToken', responseData['token']); // Store token as 'authToken'
+
+        // Fetch and store user details after login
+        await fetchUserDetails();
 
         return responseData;
       } else {
@@ -49,7 +83,10 @@ class AuthService {
 
         // Store the token in shared preferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', responseData['token']);
+        await prefs.setString('authToken', responseData['token']); // Store token as 'authToken'
+
+        // Fetch and store user details after registration
+        await fetchUserDetails();
 
         return responseData;
       } else {
@@ -60,12 +97,12 @@ class AuthService {
     }
   }
 
-  // Fetch user profile method
+  // Fetch user profile method (when needed)
   Future<Map<String, dynamic>> getUserProfile() async {
     final url = Uri.parse('$apiUrl/user');
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
+    String? token = prefs.getString('authToken');  // Make sure 'authToken' is used consistently
 
     try {
       final response = await http.get(
@@ -86,9 +123,13 @@ class AuthService {
     }
   }
 
-  // Logout method
+  // Logout method (clear token and user details)
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token'); // Remove the token
+    await prefs.remove('authToken'); // Remove the token
+    await prefs.remove('userId'); // Remove user ID
+    await prefs.remove('userName'); // Remove user name
+    await prefs.remove('userRole'); // Remove user role
+    print('User logged out and data cleared.');
   }
 }

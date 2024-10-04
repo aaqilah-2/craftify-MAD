@@ -1,10 +1,12 @@
-import 'package:craftify/providers/customer_product_listing_provider.dart';
+import 'package:craftify/providers/favorites_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:craftify/widgets/product_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:craftify/widgets/bottom_nav_bar.dart';
 import 'package:craftify/models/customer_product_listing_model.dart';
+
+import '../../providers/customer_product_listing_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -24,10 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadUserRoleAndFetchProducts() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
     setState(() {
-      userRole = prefs.getInt(
-          'userRole'); // Retrieve user role from shared preferences
+      userRole = prefs.getInt('userRole');
       print("User role retrieved: $userRole");
     });
 
@@ -39,6 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       print('No token found. Please log in again.');
     }
+
+    // Wait for user details to be fetched, then load favorites from local JSON
+    await Provider.of<FavoritesManager>(context, listen: false)
+        .loadFavoritesFromLocal();
   }
 
   void _onSegmentTapped(int index) {
@@ -48,17 +52,18 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _showSnackbar(BuildContext context, String message) {
+    final snackBar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = Theme
-        .of(context)
-        .brightness == Brightness.dark;
-    bool isPortrait = MediaQuery
-        .of(context)
-        .orientation == Orientation.portrait;
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
-    final productProvider = Provider.of<CustomerProductListingProvider>(
-        context);
+    final productProvider = Provider.of<CustomerProductListingProvider>(context);
+    final favoritesManager = Provider.of<FavoritesManager>(context);
     final isLoading = productProvider.isLoading;
     final products = productProvider.products;
 
@@ -98,8 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
         slivers: <Widget>[
           SliverAppBar(
             leading: IconButton(
-              icon: Icon(
-                  Icons.menu, color: isDarkMode ? Colors.white : Colors.black),
+              icon: Icon(Icons.menu, color: isDarkMode ? Colors.white : Colors.black),
               onPressed: () {
                 _scaffoldKey.currentState?.openDrawer();
               },
@@ -107,16 +111,12 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Center(
               child: Text(
                 'Craftify',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'Roboto',
-                ),
+                style: TextStyle(color: Colors.black, fontFamily: 'Roboto'),
               ),
             ),
             actions: [
               IconButton(
-                icon: Icon(Icons.settings,
-                    color: isDarkMode ? Colors.white : Colors.black),
+                icon: Icon(Icons.settings, color: isDarkMode ? Colors.white : Colors.black),
                 onPressed: () {
                   print('Settings button tapped.');
                 },
@@ -170,39 +170,30 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () => _onSegmentTapped(0),
                         child: Text(
                           'Recent',
-                          style: TextStyle(color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Roboto'),
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Roboto'),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _selectedSegment == 0 ? Colors.pink
-                              .shade100 : Colors.grey,
+                          backgroundColor: _selectedSegment == 0 ? Colors.pink.shade100 : Colors.grey,
                         ),
                       ),
                       ElevatedButton(
                         onPressed: () => _onSegmentTapped(1),
                         child: Text(
                           'Popular',
-                          style: TextStyle(color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Roboto'),
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Roboto'),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _selectedSegment == 1 ? Colors.pink
-                              .shade100 : Colors.grey,
+                          backgroundColor: _selectedSegment == 1 ? Colors.pink.shade100 : Colors.grey,
                         ),
                       ),
                       ElevatedButton(
                         onPressed: () => _onSegmentTapped(2),
                         child: Text(
                           'Recommended',
-                          style: TextStyle(color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Roboto'),
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Roboto'),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _selectedSegment == 2 ? Colors.pink
-                              .shade100 : Colors.grey,
+                          backgroundColor: _selectedSegment == 2 ? Colors.pink.shade100 : Colors.grey,
                         ),
                       ),
                     ],
@@ -210,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 isLoading
                     ? Center(child: CircularProgressIndicator())
-                    : _buildProductList(products, isDarkMode),
+                    : _buildProductList(products, isDarkMode, favoritesManager),
               ],
             ),
           ),
@@ -235,8 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildProductList(List<CustomerProductListing> customerProducts,
-      bool isDarkMode) {
+  Widget _buildProductList(List<CustomerProductListing> customerProducts, bool isDarkMode, FavoritesManager favoritesManager) {
     if (customerProducts.isEmpty) {
       print("No products found.");
       return Center(child: Text('No products available.'));
@@ -255,13 +245,24 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       itemCount: customerProducts.length,
       itemBuilder: (context, index) {
-        print("Displaying product: ${customerProducts[index].name}");
+        final product = customerProducts[index];
+
+        print("Displaying product: ${product.name}");
         return ProductCard(
-          customerProduct: customerProducts[index],
+          customerProduct: product,
           isDarkMode: isDarkMode,
+          isFavorite: favoritesManager.isFavorite(product.id), // Check if it's a favorite
+          onFavoriteToggle: () {
+            setState(() {
+              favoritesManager.toggleFavorite(product.id); // Add/remove from favorites
+              String message = favoritesManager.isFavorite(product.id)
+                  ? 'Added to favorites: ${product.name}'
+                  : 'Removed from favorites: ${product.name}';
+              _showSnackbar(context, message); // Show Snackbar
+            });
+          },
         );
       },
     );
   }
 }
-

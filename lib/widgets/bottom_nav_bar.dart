@@ -52,7 +52,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             Navigator.pushReplacementNamed(context, '/favorites');
             break;
           case 3:
-            Navigator.pushReplacementNamed(context, '/profile');
+            Navigator.pushReplacementNamed(context, '/customer_profile');
             break;
         }
       }

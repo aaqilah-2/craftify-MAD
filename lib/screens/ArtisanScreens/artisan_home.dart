@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:craftify/widgets/bottom_nav_bar.dart'; // Import BottomNavBar
 
+
 class ArtisanHomeScreen extends StatefulWidget {
   @override
   _ArtisanHomeScreenState createState() => _ArtisanHomeScreenState();

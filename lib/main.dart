@@ -3,12 +3,11 @@ import 'package:craftify/providers/customer_product_listing_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:craftify/providers/product_provider.dart'; // Import ProductProvider
+import 'package:craftify/providers/favorites_manager.dart'; // Import the FavoritesManager
 import 'routes.dart'; // Import routes.dart file
 import 'package:craftify/screens/AuthScreens/login_screen.dart';
 import 'package:craftify/screens/AuthScreens/register_screen.dart';
 import 'package:craftify/providers/CustomerProfileProvider.dart'; // Import the new CustomerProfileProvider
-
-
 
 void main() {
   runApp(
@@ -18,7 +17,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => ProfileProvider()), // Add your ProfileProvider here
         ChangeNotifierProvider(create: (_) => CustomerProfileProvider()), // Customer Profile Provider
         ChangeNotifierProvider(create: (_) => CustomerProductListingProvider()), // Add CustomerProductListingProvider here
-
+        ChangeNotifierProvider(create: (_) => FavoritesManager()), // Add FavoritesManager here
       ],
       child: MyApp(),
     ),
