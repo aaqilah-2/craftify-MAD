@@ -14,7 +14,7 @@ class LoginScreen extends StatelessWidget {
     try {
       // Making API request
       final response = await http.post(
-        Uri.parse('http://192.168.8.101:8000/api/user/auth'), // Update with your API URL
+        Uri.parse('http://192.168.8.104:8000/api/user/auth'), // Update with your API URL
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
       );

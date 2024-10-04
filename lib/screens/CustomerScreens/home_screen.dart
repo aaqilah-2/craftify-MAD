@@ -1,7 +1,10 @@
+import 'package:craftify/providers/customer_product_listing_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:craftify/widgets/bottom_nav_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:craftify/widgets/product_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:craftify/widgets/bottom_nav_bar.dart';
+import 'package:craftify/models/customer_product_listing_model.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -16,78 +19,48 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadUserRole();
+    _loadUserRoleAndFetchProducts();
   }
 
-  Future<void> _loadUserRole() async {
+  Future<void> _loadUserRoleAndFetchProducts() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
     setState(() {
-      userRole = prefs.getInt('userRole'); // Retrieve user role from shared preferences
+      userRole = prefs.getInt(
+          'userRole'); // Retrieve user role from shared preferences
+      print("User role retrieved: $userRole");
     });
+
+    String? token = prefs.getString('authToken');
+    if (token != null) {
+      print("Token found: $token");
+      await Provider.of<CustomerProductListingProvider>(context, listen: false)
+          .fetchApprovedProducts();
+    } else {
+      print('No token found. Please log in again.');
+    }
   }
 
   void _onSegmentTapped(int index) {
     setState(() {
       _selectedSegment = index;
+      print('Segment tapped: $_selectedSegment');
     });
-  }
-
-  Widget _buildSegmentContent() {
-    // Placeholder data for product cards
-    List<ProductCardData> products = [
-      ProductCardData(
-        title: 'Ceramic Bug Cube',
-        price: 'Rs.1000.00',
-        image: 'assets/images/image1.png',
-        description:
-        'A unique square-shaped ceramic piece, artfully designed in sleek black. This bug-inspired sculpture adds a touch of whimsical elegance to any space.',
-        rating: 4.5,
-      ),
-      ProductCardData(
-        title: 'Ebon Cream Wall Art',
-        price: 'Rs.2000.00',
-        image: 'assets/images/image2.png',
-        description:
-        'A striking piece of wall art featuring a harmonious blend of black and cream colors. This handcrafted artwork is perfect for adding a modern yet rustic charm to your decor.',
-        rating: 3.8,
-      ),
-      // Add more products as needed
-    ];
-
-    // Filter products based on selected segment (not implemented in this example)
-    return Column(
-      children: List.generate(products.length ~/ 2, (index) {
-        int startIndex = index * 2;
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ProductCard(
-              title: products[startIndex].title,
-              price: products[startIndex].price,
-              image: products[startIndex].image,
-              description: products[startIndex].description,
-              rating: products[startIndex].rating,
-              isDarkMode: Theme.of(context).brightness == Brightness.dark,
-            ),
-            if (startIndex + 1 < products.length)
-              ProductCard(
-                title: products[startIndex + 1].title,
-                price: products[startIndex + 1].price,
-                image: products[startIndex + 1].image,
-                description: products[startIndex + 1].description,
-                rating: products[startIndex + 1].rating,
-                isDarkMode: Theme.of(context).brightness == Brightness.dark,
-              ),
-          ],
-        );
-      }),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    bool isDarkMode = Theme
+        .of(context)
+        .brightness == Brightness.dark;
+    bool isPortrait = MediaQuery
+        .of(context)
+        .orientation == Orientation.portrait;
+
+    final productProvider = Provider.of<CustomerProductListingProvider>(
+        context);
+    final isLoading = productProvider.isLoading;
+    final products = productProvider.products;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -108,14 +81,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            ListTile(
-              leading: Icon(Icons.art_track),
-              title: Text('WALL ART', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Roboto')),
-              onTap: () {
-                // Navigate to Wall Art category
-              },
-            ),
-            // Add more categories here
+            _buildDrawerItem(Icons.diamond, 'Jewelry', context),
+            _buildDrawerItem(Icons.checkroom, 'Clothing', context),
+            _buildDrawerItem(Icons.home, 'Home Decor', context),
+            _buildDrawerItem(Icons.palette, 'Art & Collectibles', context),
+            _buildDrawerItem(Icons.toys, 'Toys', context),
+            _buildDrawerItem(Icons.handyman, 'Craft Supplies', context),
+            _buildDrawerItem(Icons.style, 'Accessories', context),
+            _buildDrawerItem(Icons.menu_book, 'Stationery', context),
+            _buildDrawerItem(Icons.shopping_bag, 'Bags & Purses', context),
+            _buildDrawerItem(Icons.more_horiz, 'Other', context),
           ],
         ),
       ),
@@ -123,7 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
         slivers: <Widget>[
           SliverAppBar(
             leading: IconButton(
-              icon: Icon(Icons.menu, color: isDarkMode ? Colors.white : Colors.black),
+              icon: Icon(
+                  Icons.menu, color: isDarkMode ? Colors.white : Colors.black),
               onPressed: () {
                 _scaffoldKey.currentState?.openDrawer();
               },
@@ -139,9 +115,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             actions: [
               IconButton(
-                icon: Icon(Icons.settings, color: isDarkMode ? Colors.white : Colors.black),
+                icon: Icon(Icons.settings,
+                    color: isDarkMode ? Colors.white : Colors.black),
                 onPressed: () {
-                  // Settings action
+                  print('Settings button tapped.');
                 },
               ),
             ],
@@ -172,13 +149,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       IconButton(
                         icon: Icon(Icons.filter_list),
                         onPressed: () {
-                          // Filter action
+                          print('Filter button tapped.');
                         },
                       ),
                       IconButton(
                         icon: Icon(Icons.notifications),
                         onPressed: () {
-                          // Notification action
+                          print('Notifications button tapped.');
                         },
                       ),
                     ],
@@ -193,61 +170,98 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () => _onSegmentTapped(0),
                         child: Text(
                           'Recent',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Roboto'),
+                          style: TextStyle(color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Roboto'),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _selectedSegment == 0 ? Colors.pink.shade100 : Colors.grey,
+                          backgroundColor: _selectedSegment == 0 ? Colors.pink
+                              .shade100 : Colors.grey,
                         ),
                       ),
                       ElevatedButton(
                         onPressed: () => _onSegmentTapped(1),
                         child: Text(
                           'Popular',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Roboto'),
+                          style: TextStyle(color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Roboto'),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _selectedSegment == 1 ? Colors.pink.shade100 : Colors.grey,
+                          backgroundColor: _selectedSegment == 1 ? Colors.pink
+                              .shade100 : Colors.grey,
                         ),
                       ),
                       ElevatedButton(
                         onPressed: () => _onSegmentTapped(2),
                         child: Text(
                           'Recommended',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Roboto'),
+                          style: TextStyle(color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Roboto'),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _selectedSegment == 2 ? Colors.pink.shade100 : Colors.grey,
+                          backgroundColor: _selectedSegment == 2 ? Colors.pink
+                              .shade100 : Colors.grey,
                         ),
                       ),
                     ],
                   ),
                 ),
-                _buildSegmentContent(),
+                isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : _buildProductList(products, isDarkMode),
               ],
             ),
           ),
         ],
       ),
-      // Add BottomNavBar with userRole for customer
       bottomNavigationBar: userRole != null
-          ? BottomNavBar(currentIndex: 0, userRole: userRole!) // Assuming 0 is for Home
-          : SizedBox(), // Show nothing until userRole is loaded
+          ? BottomNavBar(currentIndex: 0, userRole: userRole!)
+          : SizedBox(),
+    );
+  }
+
+  ListTile _buildDrawerItem(IconData icon, String title, BuildContext context) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.black),
+      title: Text(
+        title,
+        style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Roboto'),
+      ),
+      onTap: () {
+        print('$title tapped.');
+      },
+    );
+  }
+
+  Widget _buildProductList(List<CustomerProductListing> customerProducts,
+      bool isDarkMode) {
+    if (customerProducts.isEmpty) {
+      print("No products found.");
+      return Center(child: Text('No products available.'));
+    }
+
+    print("Building product list with ${customerProducts.length} products.");
+    return GridView.builder(
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16.0,
+        mainAxisSpacing: 16.0,
+        childAspectRatio: 0.75,
+      ),
+      itemCount: customerProducts.length,
+      itemBuilder: (context, index) {
+        print("Displaying product: ${customerProducts[index].name}");
+        return ProductCard(
+          customerProduct: customerProducts[index],
+          isDarkMode: isDarkMode,
+        );
+      },
     );
   }
 }
 
-class ProductCardData {
-  final String title;
-  final String price;
-  final String image;
-  final String description;
-  final double rating;
-
-  ProductCardData({
-    required this.title,
-    required this.price,
-    required this.image,
-    required this.description,
-    required this.rating,
-  });
-}

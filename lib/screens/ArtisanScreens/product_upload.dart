@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart'; // Import permission handler
 import 'package:craftify/widgets/bottom_nav_bar.dart'; // Import the BottomNavBar
+import 'package:image/image.dart' as img; // Add this for resizing image if needed
 
 class UploadProductScreen extends StatefulWidget {
   @override
@@ -17,9 +21,23 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
-  TextEditingController _categoryController = TextEditingController();
+  String? _selectedCategory; // For dropdown category selection
   bool _isLoading = false;
   int userRole = 0; // Variable to hold the role value
+
+  // List of categories for dropdown
+  final List<String> _categories = [
+    'Jewelry',
+    'Clothing',
+    'Home Decor',
+    'Art & Collectibles',
+    'Toys',
+    'Craft Supplies',
+    'Accessories',
+    'Stationery',
+    'Bags & Purses',
+    'Other'  // Include "Other" at the end
+  ];
 
   @override
   void initState() {
@@ -35,13 +53,44 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
     print('Retrieved User Role: $userRole'); // Debugging user role retrieval
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
+  // Method to pick an image from gallery or camera
+  Future<void> _pickImage(ImageSource source) async {
+    if (source == ImageSource.camera) {
+      if (await Permission.camera.request().isGranted) {
+        final pickedFile = await picker.pickImage(source: source);
+        if (pickedFile != null) {
+          _processPickedImage(File(pickedFile.path));
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Camera permission denied')),
+        );
       }
-    });
+    } else {
+      final pickedFile = await picker.pickImage(source: source);
+      if (pickedFile != null) {
+        _processPickedImage(File(pickedFile.path));
+      }
+    }
+  }
+
+  // Process image and reduce size if necessary
+  Future<void> _processPickedImage(File imageFile) async {
+    // Resize the image if it's too large
+    final originalImage = img.decodeImage(imageFile.readAsBytesSync());
+    if (originalImage != null && originalImage.width > 1024) {
+      final resizedImage = img.copyResize(originalImage, width: 1024); // Resize to 1024px wide
+      final directory = await getTemporaryDirectory();
+      final String newPath = '${directory.path}/${DateTime.now().toIso8601String()}.jpg';
+      final resizedFile = File(newPath)..writeAsBytesSync(img.encodeJpg(resizedImage));
+      setState(() {
+        _image = resizedFile; // Use the resized image
+      });
+    } else {
+      setState(() {
+        _image = imageFile; // Use the original image if not large
+      });
+    }
   }
 
   Future<void> _uploadProduct() async {
@@ -75,15 +124,19 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
       try {
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('http://192.168.8.101:8000/api/products'), // Update with your API URL
+          Uri.parse('http://192.168.8.104:8000/api/products'), // Update with your API URL
         );
         request.headers['Authorization'] = 'Bearer $token';
         request.fields['name'] = _nameController.text;
         request.fields['description'] = _descriptionController.text;
         request.fields['price'] = _priceController.text;
-        request.fields['category'] = _categoryController.text;
+        request.fields['category'] = _selectedCategory!; // Use selected category
 
-        request.files.add(await http.MultipartFile.fromPath('image', _image!.path));
+        request.files.add(await http.MultipartFile.fromPath(
+          'image',
+          _image!.path,
+          contentType: MediaType('image', 'jpeg'),
+        ));
 
         final response = await request.send();
 
@@ -150,21 +203,47 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                   value!.isEmpty ? 'Enter price' : null,
                 ),
                 SizedBox(height: 10),
-                TextFormField(
-                  controller: _categoryController,
+
+                // Dropdown for category selection
+                DropdownButtonFormField<String>(
+                  value: _selectedCategory,
                   decoration: InputDecoration(labelText: 'Category'),
+                  items: _categories.map((String category) {
+                    return DropdownMenuItem<String>(
+                      value: category,
+                      child: Text(category),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedCategory = value;
+                    });
+                  },
                   validator: (value) =>
-                  value!.isEmpty ? 'Enter category' : null,
+                  value == null ? 'Select a category' : null,
                 ),
+
                 SizedBox(height: 20),
                 _image != null
                     ? Image.file(_image!, height: 150)
                     : Text('No image selected'),
                 SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _pickImage,
-                  child: Text('Select Image'),
+
+                // Button to select image source (gallery or camera)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => _pickImage(ImageSource.gallery),
+                      child: Text('Select from Gallery'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => _pickImage(ImageSource.camera),
+                      child: Text('Take a Picture'),
+                    ),
+                  ],
                 ),
+
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _uploadProduct,
@@ -175,7 +254,8 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
           ),
         ),
       ),
-      // Add the BottomNavBar with the userRole from SharedPreferences
+
+      // Bottom Navigation Bar remains unchanged
       bottomNavigationBar: BottomNavBar(
         currentIndex: 2, // Assuming Orders is at index 3 for Artisan
         userRole: userRole, // Use the retrieved user role dynamically

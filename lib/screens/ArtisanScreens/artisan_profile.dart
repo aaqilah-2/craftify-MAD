@@ -36,7 +36,7 @@ class _ArtisanProfileScreenState extends State<ArtisanProfileScreen> {
             if (token != null) {
                 // Make the API call to the logout route
                 final response = await http.post(
-                    Uri.parse('http://192.168.8.101:8000/api/logout'), // Your logout API URL
+                    Uri.parse('http://192.168.8.104:8000/api/logout'), // Your logout API URL
                     headers: {
                         'Authorization': 'Bearer $token',
                         'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ class _ArtisanProfileScreenState extends State<ArtisanProfileScreen> {
 
             if (token != null) {
                 final response = await http.get(
-                    Uri.parse('http://192.168.8.101:8000/api/artisan/profile'),
+                    Uri.parse('http://192.168.8.104:8000/api/artisan/profile'),
                     headers: {
                         'Authorization': 'Bearer $token', // Send token in Authorization header
                         'Content-Type': 'application/json',

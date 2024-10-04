@@ -5,8 +5,19 @@ import 'package:craftify/models/product.dart';
 import 'package:craftify/screens/ArtisanScreens/product_upload.dart';
 
 import 'edit_product.dart'; // If you want to navigate to edit product screen
+class ProductsListedScreen extends StatefulWidget {
+  @override
+  _ProductsListedScreenState createState() => _ProductsListedScreenState();
+}
 
-class ProductsListedScreen extends StatelessWidget {
+class _ProductsListedScreenState extends State<ProductsListedScreen> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final productProvider = Provider.of<ProductProvider>(context, listen: false);
+    productProvider.fetchProductsByStatus('approved');  // Automatically refresh products on entering the screen
+  }
+
   @override
   Widget build(BuildContext context) {
     final products = Provider.of<ProductProvider>(context).products;

@@ -14,7 +14,7 @@ class ProfileService {
     }
 
     final response = await http.get(
-      Uri.parse('http://192.168.8.101:8000/api/artisan/profile'),
+      Uri.parse('http://192.168.8.104:8000/api/artisan/profile'),
       headers: {
         'Authorization': 'Bearer $token',
       },

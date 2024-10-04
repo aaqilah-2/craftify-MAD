@@ -32,6 +32,8 @@ Route<dynamic>? generateAnimatedRoute(RouteSettings settings) {
           );
         },
       );
+
+
     // case '/cart':
     //   return PageRouteBuilder(
     //     pageBuilder: (context, animation, secondaryAnimation) => CartScreen(),
@@ -125,6 +127,11 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/customer_register': (context) => CustomerProfileForm(),
   '/home': (context) => HomeScreen(), //customer home page
   '/customer_profile': (context) =>CustomerProfileScreen(),
+
+
+
+
+
   //old customer routes
  // '/cart': (context) => CartScreen(),
   //'/favorites': (context) => FavoritesScreen(),

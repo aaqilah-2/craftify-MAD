@@ -62,7 +62,7 @@ class _ArtisanProfileFormState extends State<ArtisanProfileForm> {
 
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://192.168.8.101:8000/api/artisan/profile'), // Update the URL
+        Uri.parse('http://192.168.8.104:8000/api/artisan/profile'), // Update the URL
       );
 
       request.headers.addAll(headers);  // Add headers to the request
