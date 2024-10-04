@@ -1,0 +1,52 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Ceramic Bug Cube",
+      "description": "A unique square-shaped ceramic piece, artfully designed in sleek black. This bug-inspired sculpture adds a touch of whimsical elegance to any space.",
+      "price": "$10.00",
+      "category": "Home Decor",
+      "image": "assets/images/image1.png"
+    },
+    {
+      "id": 2,
+      "name": "Ebon Cream Wall Art",
+      "description": "A striking piece of wall art featuring a harmonious blend of black and cream colors. This handcrafted artwork is perfect for adding a modern yet rustic charm to your decor.",
+      "price": "$20.00",
+      "category": "Wall Art",
+      "image": "assets/images/image2.png"
+    },
+    {
+      "id": 3,
+      "name": "Keepsake Box",
+      "description": "This exquisite box is crafted from delicately stitched bamboo canes. Perfect for storing your treasured items, it brings a touch of nature's beauty into your home.",
+      "price": "$30.00",
+      "category": "Storage",
+      "image": "assets/images/image3.png"
+    },
+    {
+      "id": 4,
+      "name": "Bamboo Cake Tray",
+      "description": "A beautifully handcrafted tray made from bamboo canes, ideal for serving cakes and pastries. Its rustic elegance makes it a perfect centerpiece for your gatherings.",
+      "price": "$40.00",
+      "category": "Kitchen & Dine",
+      "image": "assets/images/image4.png"
+    },
+    {
+      "id": 5,
+      "name": "Artisan Carry Box",
+      "description": "A handmade carrier box that combines functionality with aesthetic appeal. Its sturdy construction and natural finish make it ideal for transporting goods with style.",
+      "price": "$50.00",
+      "category": "Storage",
+      "image": "assets/images/image5.png"
+    },
+    {
+      "id": 6,
+      "name": "Feather Charm Stick",
+      "description": "An enchanting ornament stick adorned with delicate feathers. This handcrafted piece adds a bohemian flair to any setting, perfect for enhancing your decorative arrangements.",
+      "price": "$60.00",
+      "category": "Home Decor",
+      "image": "assets/images/image6.png"
+    }
+  ]
+}

@@ -46,7 +46,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             Navigator.pushReplacementNamed(context, '/home');
             break;
           case 1:
-            Navigator.pushReplacementNamed(context, '/cart');
+            Navigator.pushReplacementNamed(context, '/artisan_list_screen');
             break;
           case 2:
             Navigator.pushReplacementNamed(context, '/favorites');

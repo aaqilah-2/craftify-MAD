@@ -1,4 +1,5 @@
 import 'package:craftify/providers/ProfileProvider.dart';
+//import 'package:craftify/providers/artisan_provider.dart';
 import 'package:craftify/providers/customer_product_listing_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => CustomerProfileProvider()), // Customer Profile Provider
         ChangeNotifierProvider(create: (_) => CustomerProductListingProvider()), // Add CustomerProductListingProvider here
         ChangeNotifierProvider(create: (_) => FavoritesManager()), // Add FavoritesManager here
+       // ChangeNotifierProvider(create: (_) => ArtisanProvider()), // Add ArtisanProvider here
+
       ],
       child: MyApp(),
     ),

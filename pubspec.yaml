@@ -89,6 +89,8 @@ flutter:
     - assets/images/profilepic.png
     - assets/images/logo.png
     - assets/images/slogan.png
+    - assets/products.json
+    - assets/images/artsinahome.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

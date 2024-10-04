@@ -1,5 +1,6 @@
 //import 'dart:js';
 
+//import 'package:craftify/screens/CustomerScreens/artisan_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/AuthScreens/login_screen.dart';
 import 'screens/AuthScreens/register_screen.dart';
@@ -128,7 +129,7 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/home': (context) => HomeScreen(), //customer home page
   '/customer_profile': (context) =>CustomerProfileScreen(),
   '/favorites': (context) => FavoritesScreen(),
-
+//'/artisan_list_screen' : (context) =>ArtisanListScreen(),
 
 
 

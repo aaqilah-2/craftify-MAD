@@ -25,6 +25,8 @@ class ProfileProvider with ChangeNotifier {
     notifyListeners(); // Notify listeners to update UI
   }
 
+
+
   // Method to fetch the profile data
   Future<void> fetchProfile() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -63,4 +65,6 @@ class ProfileProvider with ChangeNotifier {
       throw Exception("Failed to load profile data");
     }
   }
+
+
 }

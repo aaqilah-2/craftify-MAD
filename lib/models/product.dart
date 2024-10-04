@@ -7,6 +7,7 @@ class Product {
   final String imageUrl;
   final String category;
 
+
   Product({
     required this.id,
     required this.name,
